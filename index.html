@@ -4,145 +4,43 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DIMC.JP - Social Media Services</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
-      crossorigin="anonymous"
-    />
+    <title>Flex Message Form with Sample Data</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-      <div class="w-100 px-3">
-        <h3 class="mb-3">แชร์ไปได้บุญ เพราะคุณคือกัลยาณมิตร</h3>
-        <button class="btn btn-success btn-block btn-lg w-100" id="btn-share">
-          กดเพื่อเลือกเพื่อน & กลุ่ม
-        </button>
-      </div>
+    <div class="container mt-5">
+      <h3 class="mb-4">สร้าง Flex Message จากข้อมูลตัวอย่าง</h3>
+
+      <!-- Button to load sample data -->
+      <button id="load-sample-data" class="btn btn-secondary mb-3">ดึงข้อมูลตัวอย่าง</button>
+
+      <form id="flex-form">
+        <div class="mb-3">
+          <label for="title" class="form-label">หัวข้อ (Title)</label>
+          <input type="text" class="form-control" id="title" placeholder="กรอกหัวข้อ" required />
+        </div>
+        <div class="mb-3">
+          <label for="monkName" class="form-label">ชื่อพระ (Monk Name)</label>
+          <input type="text" class="form-control" id="monkName" placeholder="กรอกชื่อพระ" />
+        </div>
+        <div class="mb-3">
+          <label for="imgurl" class="form-label">ลิงก์รูปภาพ (Image URL)</label>
+          <input type="url" class="form-control" id="imgurl" placeholder="กรอก URL รูปภาพ" required />
+        </div>
+        <div class="mb-3">
+          <label for="sessionDate" class="form-label">วันที่ (Session Date)</label>
+          <input type="date" class="form-control" id="sessionDate" />
+        </div>
+        <div class="mb-3">
+          <label for="linkuri" class="form-label">ลิงก์เว็บไซต์ (Link URI)</label>
+          <input type="url" class="form-control" id="linkuri" placeholder="กรอก URL" required />
+        </div>
+        <button type="submit" class="btn btn-primary">สร้างและแชร์ Flex Message</button>
+      </form>
     </div>
-    <script
-      charset="utf-8"
-      src="https://static.line-scdn.net/liff/edge/2/sdk.js"
-    ></script>
-    <script>
-      // Initialize LIFF
-      liff.init({ liffId: "1661018679-9E41MJJw" })
-        .then(() => {
-          console.log("LIFF Initialized");
-          initializeApp();
-        })
-        .catch((err) => {
-          console.error("LIFF Initialization failed:", err);
-        });
 
-      function initializeApp() {
-        let btnShare = document.querySelector("#btn-share");
-
-        btnShare.addEventListener("click", function () {
-          let title = "ข่าวใสๆ จากไลน์น้องบุญจัง";
-          let monkName = "พระอาจารย์";
-          let imgurl =
-            "https://i.ibb.co/3r0tCz3/049f6028b7078911fe9b4fef77de8007.jpg";
-          let sessionDate = "วันนี้";
-          let linkuri = "https://dimc.jp";
-
-          let msg = createFlexMsg(title, monkName, imgurl, sessionDate, linkuri);
-
-          if (liff.isInClient()) {
-            // If inside LINE client (mobile)
-            if (liff.isApiAvailable("shareTargetPicker")) {
-              liff.shareTargetPicker([msg])
-                .then(function (res) {
-                  if (res) {
-                    console.log("Message sent successfully!");
-                    liff.closeWindow();
-                  } else {
-                    console.log("User canceled the operation.");
-                  }
-                })
-                .catch(function (error) {
-                  console.error("Error sending message:", error);
-                });
-            } else {
-              alert("ฟีเจอร์แชร์นี้ต้องใช้ผ่านสมาร์ทโฟนที่เปิดแอป LINE");
-            }
-          } else {
-            // If not inside LINE client (PC or web browser)
-            console.log("Not inside LINE client, opening web version of LINE");
-            let lineURL = `https://line.me/R/share?text=${encodeURIComponent(
-              title + "\n" + linkuri
-            )}`;
-            window.open(lineURL, "_blank");
-          }
-        });
-      }
-
-      function createFlexMsg(title, monkName, imgurl, sessionDate, linkuri) {
-        return {
-          type: "flex",
-          altText: title,
-          contents: {
-            type: "bubble",
-            hero: {
-              type: "image",
-              url: imgurl,
-              size: "full",
-              aspectRatio: "20:13",
-              aspectMode: "cover",
-              action: {
-                type: "uri",
-                label: "ดูรายละเอียด",
-                uri: linkuri,
-              },
-            },
-            body: {
-              type: "box",
-              layout: "vertical",
-              contents: [
-                {
-                  type: "text",
-                  text: monkName,
-                  weight: "bold",
-                  size: "xl",
-                  margin: "md",
-                },
-                {
-                  type: "text",
-                  text: sessionDate,
-                  size: "sm",
-                  color: "#999999",
-                },
-              ],
-            },
-            footer: {
-              type: "box",
-              layout: "horizontal",
-              contents: [
-                {
-                  type: "button",
-                  action: {
-                    type: "uri",
-                    label: "เปิดดู",
-                    uri: linkuri,
-                  },
-                  style: "primary",
-                  color: "#AC390DFF",
-                },
-                {
-                  type: "button",
-                  action: {
-                    type: "uri",
-                    label: "แชร์ต่อ",
-                    uri: linkuri,
-                  },
-                  style: "primary",
-                },
-              ],
-            },
-          },
-        };
-      }
-    </script>
+    <!-- LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="script.js"></script>
   </body>
 </html>
