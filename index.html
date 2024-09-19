@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flex Message Form</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h3 class="mb-4">สร้าง Flex Message</h3>
+      <form id="flex-form">
+        <div class="mb-3">
+          <label for="title" class="form-label">หัวข้อ (Title)</label>
+          <input type="text" class="form-control" id="title" placeholder="กรอกหัวข้อ" required />
+        </div>
+        <div class="mb-3">
+          <label for="monkName" class="form-label">ชื่อพระ (Monk Name)</label>
+          <input type="text" class="form-control" id="monkName" placeholder="กรอกชื่อพระ" />
+        </div>
+        <div class="mb-3">
+          <label for="imgurl" class="form-label">ลิงก์รูปภาพ (Image URL)</label>
+          <input type="url" class="form-control" id="imgurl" placeholder="กรอก URL รูปภาพ" required />
+        </div>
+        <div class="mb-3">
+          <label for="sessionDate" class="form-label">วันที่ (Session Date)</label>
+          <input type="date" class="form-control" id="sessionDate" />
+        </div>
+        <div class="mb-3">
+          <label for="linkuri" class="form-label">ลิงก์เว็บไซต์ (Link URI)</label>
+          <input type="url" class="form-control" id="linkuri" placeholder="กรอก URL" required />
+        </div>
+        <button type="submit" class="btn btn-primary">สร้างและแชร์ Flex Message</button>
+      </form>
+    </div>
+
+    <script
+      charset="utf-8"
+      src="https://static.line-scdn.net/liff/edge/2/sdk.js"
+    ></script>
+
+    <script>
+      document.getElementById('flex-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Get form values
+        const title = document.getElementById('title').value;
+        const monkName = document.getElementById('monkName').value || 'ไม่มีชื่อพระ';
+        const imgurl = document.getElementById('imgurl').value;
+        const sessionDate = document.getElementById('sessionDate').value || 'ไม่ระบุวันที่';
+        const linkuri = document.getElementById('linkuri').value;
+
+        // Create Flex Message using form data
+        const msg = createFlexMsg(title, monkName, imgurl, sessionDate, linkuri);
+
+        // Initialize LIFF
+        liff.init({ liffId: "1661018679-9E41MJJw" })
+          .then(() => {
+            if (liff.isApiAvailable('shareTargetPicker')) {
+              liff.shareTargetPicker([msg])
+                .then(res => {
+                  if (res) {
+                    console.log('Message sent successfully!');
+                    liff.closeWindow();
+                  } else {
+                    console.log('User canceled the operation.');
+                  }
+                })
+                .catch(error => {
+                  console.error('Error sending message:', error);
+                });
+            } else {
+              alert('กรุณาเปิดบนสมาร์ทโฟน');
+            }
+          })
+          .catch(err => {
+            console.error('LIFF Initialization failed:', err);
+          });
+      });
+
+      // Create Flex Message
+      function createFlexMsg(title, monkName, imgurl, sessionDate, linkuri) {
+        return {
+          type: "flex",
+          altText: title,
+          contents: {
+            type: "bubble",
+            hero: {
+              type: "image",
+              url: imgurl,
+              size: "full",
+              aspectRatio: "20:13",
+              aspectMode: "cover",
+              action: {
+                type: "uri",
+                label: "ดูรายละเอียด",
+                uri: linkuri,
+              },
+            },
+            body: {
+              type: "box",
+              layout: "vertical",
+              contents: [
+                {
+                  type: "text",
+                  text: monkName,
+                  weight: "bold",
+                  size: "xl",
+                  margin: "md",
+                },
+                {
+                  type: "text",
+                  text: sessionDate,
+                  size: "sm",
+                  color: "#999999",
+                },
+              ],
+            },
+            footer: {
+              type: "box",
+              layout: "horizontal",
+              contents: [
+                {
+                  type: "button",
+                  action: {
+                    type: "uri",
+                    label: "เปิดดู",
+                    uri: linkuri,
+                  },
+                  style: "primary",
+                  color: "#AC390DFF",
+                },
+                {
+                  type: "button",
+                  action: {
+                    type: "uri",
+                    label: "แชร์ต่อ",
+                    uri: linkuri,
+                  },
+                  style: "primary",
+                },
+              ],
+            },
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
